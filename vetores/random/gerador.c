@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
-#define T 200000
+#define T 5
 
 int main() {
 	
@@ -14,7 +14,7 @@ int main() {
 
 	srand(time(NULL));
 
-	arq = fopen("200000.txt", "wt");
+	arq = fopen("5.txt", "wt");
 
 	if (arq == NULL) {
 		printf("Problema de leitura\n");

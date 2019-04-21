@@ -14,7 +14,7 @@ int main() {
 	char sizes[9][6] = {"100", "500", "1000", "5000", "30000", "80000", "100000", "150000", "200000"};
 
 
-	arq = fopen("200000.txt", "wt");
+	arq = fopen("5.txt", "wt");
 
 	if (arq == NULL) {
 		printf("Problema de leitura\n");
@@ -23,7 +23,7 @@ int main() {
 
 	int j, num;
 
-	for (j = 1; j <= 200000; j ++) {
+	for (j = 1; j <= 5; j ++) {
 
 		num = j;
 
