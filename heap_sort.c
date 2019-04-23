@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <math.h> //para a floor()
+#include <math.h>
 
 #define S 9
 
@@ -66,56 +66,46 @@ void get_vector(int tamanho, int * vector) {
 
 }
 
-void merge(int * vector, int p, int q, int u) {
+
+int * build_heap(int * vector, int ini, int fim){
 	
-	//Função que faz o merge dos sub-vetores
-
-	int * t, n1, n2, size, i, j, k;
-	int f1 = 0;
-	int f2 = 0;
-
-	size = u - p + 1;
-	n1 = p;
-	n2 = q + 1;
-	t = (int * ) malloc(size * sizeof(int));
-
-	if (t != NULL) {
-		for(i = 0; i < size; i++) {
-			if(!f1 && !f2) {
-				if(vector[n1] < vector[n2])
-					t[i] = vector[n1++];
-				else
-					t[i] = vector[n2++];
-				if(n1 > q) f1 = 1;
-				if(n2 > u) f2 = 2;
-			} else {
-				if(!f1)
-					t[i] = vector[n1++];
-				else
-					t[i] = vector[n2++];
-			}
+	int aux = vector[ini];
+	int j = ini * 2 + 1;
+	while(j <= fim){
+		if(j < fim){
+			if(vector[j] < vector[j + 1])
+				j++;
 		}
-		for (j = 0, k = p; j < size; j++, k++)
-			vector[k] = t[j];
+		
+		if(aux < vector[j]){
+			vector[ini] = vector[j];
+			ini = j;
+			j = 2 * ini + 1;
+		}else
+			j = fim + 1;
 	}
+	vector[ini] = aux;
 	
-	free(t);
-
+	return vector;
 }
 
-int * merge_sort(int * vector, int p, int u) {
+int * heap_sort(int * vector, int tamanho) {
 
-	//Merge Sort - algoritmo de ordenação
-	int q;
-
-	if(p < u) {
-		q = floor((p + u) / 2); //para arredondar pra cima
-		merge_sort(vector, p, q);
-		merge_sort(vector, q + 1, u);
-		merge(vector, p, q, u);
+	//Heap sort - algoritmo de ordenação
+	int i, aux;
+	
+	for (i = floor((tamanho - 1)/2); i >= 0; i--)
+		build_heap(vector, i, tamanho - 1);
+	
+	for(i = tamanho - 1; i >= 1; i--){
+		aux = vector[0];
+		vector[0] = vector[i];
+		vector[i] = aux;
+		vector = build_heap(vector, 0, i - 1);
 	}
-
+	
 	return vector;
+
 }
 
 int main() {
@@ -131,7 +121,7 @@ int main() {
 	//3 - aleatório
 	int tipo;
 
-	printf("Merge Sort\n");
+	printf("Heap Sort\n");
 
 	int i, t;
 
@@ -161,7 +151,7 @@ int main() {
 			//system("pause");
 
 			//passa tamanho - 1 para acesso correto
-			vector = merge_sort(vector, 0, tamanho - 1);
+			vector = heap_sort(vector, tamanho);
 
 			get_vector(tamanho, vector);
 
