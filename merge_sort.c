@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h> //para a floor()
 
 #define S 9
 
@@ -65,41 +66,54 @@ void get_vector(int tamanho, int * vector) {
 
 }
 
-int * quick_sort(int * vector, int p, int r) {
+void merge(int * vector, int p, int q, int u) {
 
-	//Quick sort - algoritmo de ordenação
-	//Uso do quick sort alternativo
+	int * t, n1, n2, size, i, j, k;
+	int f1 = 0;
+	int f2 = 0;
 
-	int i = p;
-	int j = r;
-	int x = vector[(p + r) / 2];
-	int aux;
+	size = u - p + 1;
+	n1 = p;
+	n2 = q + 1;
+	t = (int * ) malloc(size * sizeof(int));
 
-	while(i <= j) {
-		while(vector[i] < x) {
-			i++;
+	if (t != NULL) {
+		for(i = 0; i < size; i++) {
+			if(!f1 && !f2) {
+				if(vector[n1] < vector[n2])
+					t[i] = vector[n1++];
+				else
+					t[i] = vector[n2++];
+				if(n1 > q) f1 = 1;
+				if(n2 > u) f2 = 2;
+			} else {
+				if(!f1)
+					t[i] = vector[n1++];
+				else
+					t[i] = vector[n2++];
+			}
 		}
-		while(vector[j] > x) {
-			j--;
-		}
-		if(i <= j){
-			aux = vector[i];
-			vector[i] = vector[j];
-			vector[j] = aux;
-			i++;
-			j--;
-		}
+		for (j = 0, k = p; j < size; j++, k++)
+			vector[k] = t[j];
 	}
 	
-	if(p < j){
-		quick_sort(vector, p, j);
-	}
-	if(r > i){
-		quick_sort(vector, i, r);
+	free(t);
+
+}
+
+int * merge_sort(int * vector, int p, int u) {
+
+	//Merge Sort - algoritmo de ordenação
+	int q;
+
+	if(p < u) {
+		q = floor((p + u) / 2); //para arredondar pra cima
+		merge_sort(vector, p, q);
+		merge_sort(vector, q + 1, u);
+		merge(vector, p, q, u);
 	}
 
 	return vector;
-
 }
 
 int main() {
@@ -115,7 +129,7 @@ int main() {
 	//3 - aleatório
 	int tipo;
 
-	printf("Quick Sort\n");
+	printf("Merge Sort\n");
 
 	int i, t;
 
@@ -145,7 +159,7 @@ int main() {
 			//system("pause");
 
 			//passa tamanho - 1 para acesso correto
-			vector = quick_sort(vector, 0, tamanho - 1);
+			vector = merge_sort(vector, 0, tamanho - 1);
 
 			get_vector(tamanho, vector);
 
