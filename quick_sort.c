@@ -5,6 +5,8 @@
 
 #define S 9
 
+double comparacao;
+
 typedef struct {
 	
 	double cpu;
@@ -76,9 +78,9 @@ void get_vector(int tamanho, int * vector) {
 
 }
 
-void grava_comparacao(double c, int tamanho, int tipo) {
+void grava_comparacao(int tamanho, int tipo) {
 	
-	FILE * comparacao;//arquivo para gravar os resultados de comparacao
+	FILE * comp;//arquivo para gravar os resultados de comparacao
 	
 	char path[50]; //caminho para o arquivo
 	char type[5]; //para guardar o ".txt"
@@ -101,18 +103,18 @@ void grava_comparacao(double c, int tamanho, int tipo) {
 	strcat(path, arquivo);
 	strcat(path, type);
 	
-	comparacao = fopen (path, "wt");
+	comp = fopen (path, "wt");
 
-	if (comparacao == NULL) {
+	if (comp == NULL) {
 		printf("Erro ao abrir o arquivo.\n");
 		exit(1);
 	}
 	
-	fprintf(comparacao, "%.0lf\n", c);
-	fclose(comparacao);
+	fprintf(comp, "%.0lf\n", comparacao);
+	fclose(comp);
 }
 
-int * quick_sort(int * vector, int p, int r, int TAM, int tipo) {
+void quick_sort(int * vector, int p, int r) {
 
 	//Quick sort - algoritmo de ordenação
 	//Uso do quick sort alternativo
@@ -120,21 +122,23 @@ int * quick_sort(int * vector, int p, int r, int TAM, int tipo) {
 	int j = r;
 	int x = vector[(p + r) / 2];
 	int aux;
-	
-	//double comparacao = 0;
 
 	while(i <= j) {
-		//comparacao++;
+		comparacao++;//While
 		while(vector[i] < x) {
-			//comparacao++;
+			comparacao++;//While
 			i++;
 		}
+		comparacao++;//While
+		
 		while(vector[j] > x) {
-			//comparacao++;
+			comparacao++;//While
 			j--;
 		}
+		comparacao++;//While
+		
+		comparacao++;//If
 		if(i <= j){
-			//comparacao++;
 			aux = vector[i];
 			vector[i] = vector[j];
 			vector[j] = aux;
@@ -142,19 +146,19 @@ int * quick_sort(int * vector, int p, int r, int TAM, int tipo) {
 			j--;
 		}
 	}
+	comparacao++;//While
 	
+	comparacao++;//if
 	if(p < j){
-		//comparacao++;
-		quick_sort(vector, p, j, TAM, tipo);
+		quick_sort(vector, p, j);
 	}
+	
+	comparacao++;//if
 	if(r > i){
-		//comparacao++;
-		quick_sort(vector, i, r, TAM, tipo);
+		quick_sort(vector, i, r);
 	}
 	
-	//grava_comparacao(comparacao, TAM, tipo);
-	
-	return vector;
+	//return vector;
 
 }
 
@@ -224,8 +228,9 @@ int main() {
 			int * vector = abre_arquivo(tamanho, tipo);
 
 			//passa tamanho - 1 para acesso correto
+			comparacao = 0;
 			start = clock();
-			vector = quick_sort(vector, 0, tamanho - 1, tamanho, tipo);
+			quick_sort(vector, 0, tamanho - 1);
 			end = clock();
 
 			cpu_time_used.cpu = ((double) (end - start)) / CLOCKS_PER_SEC;
@@ -233,6 +238,8 @@ int main() {
 			cpu_time_used.type = tipo;
 
 			grava_tempo(cpu_time_used);
+			
+			grava_comparacao(tamanho, tipo);
 			
 		}
 
