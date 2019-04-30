@@ -6,14 +6,14 @@
 #define S 9
 
 typedef struct {
-	
+
 	double cpu;
-	
+
 	int size;
-	
+
 	int type;
-	
-}time_cpu;
+
+} time_cpu;
 
 int * abre_arquivo(int tamanho, int tipo) {
 
@@ -77,14 +77,14 @@ void get_vector(int tamanho, int * vector) {
 }
 
 void grava_comparacao(double c, int tamanho, int tipo) {
-	
+
 	FILE * comparacao;//arquivo para gravar os resultados de comparacao
-	
+
 	char path[50]; //caminho para o arquivo
 	char type[5]; //para guardar o ".txt"
 	char arquivo[10]; //para guardar o nome do arquivo
 	char ordem[15];
-	
+
 	//./resultados/bubble_sort/comparacao
 	strcpy(path, "./resultados/bubble_sort/comparacao/");
 	if (tipo == 1)
@@ -93,58 +93,34 @@ void grava_comparacao(double c, int tamanho, int tipo) {
 		strcpy(ordem, "decrescente_");
 	else
 		strcpy(ordem, "random_");
-	
+
 	sprintf(arquivo, "%d", tamanho);
 	strcpy(type, ".txt");
 
 	strcat(path, ordem);
 	strcat(path, arquivo);
 	strcat(path, type);
-	
+
 	comparacao = fopen (path, "wt");
 
 	if (comparacao == NULL) {
 		printf("Erro ao abrir o arquivo.\n");
 		exit(1);
 	}
-	
+
 	fprintf(comparacao, "%.0lf\n", c);
 	fclose(comparacao);
 }
 
-void bubble_sort(int tamanho, int * vector, int tipo) {
-
-	//Bubble Sort - algoritmo de ordenação
-	
-	double comparacao = 0; //conta as comparações feitas
-
-	int i, j, aux;
-	for (i = 0; i < tamanho; i++) {
-		comparacao++;
-		for (j = 0; j < tamanho - 1; j++) {
-			comparacao++;
-			if(vector[j] > vector[j + 1]) {
-				comparacao++;
-				aux = vector[j];
-				vector[j] = vector[j + 1];
-				vector[j + 1] = aux;
-			}
-		}
-	}
-	
-	grava_comparacao(comparacao, tamanho, tipo);
-
-}
-
 void grava_tempo(time_cpu cpu_time_used) {
-	
+
 	FILE * tempo;//arquivo para gravar os resultados de tempo
-	
+
 	char path[50]; //caminho para o arquivo
 	char type[5]; //para guardar o ".txt"
 	char arquivo[10]; //para guardar o nome do arquivo
 	char ordem[15];
-	
+
 	//./resultados/bubble_sort/tempo
 	strcpy(path, "./resultados/bubble_sort/tempo/");
 	if (cpu_time_used.type == 1)
@@ -153,24 +129,61 @@ void grava_tempo(time_cpu cpu_time_used) {
 		strcpy(ordem, "decrescente_");
 	else
 		strcpy(ordem, "random_");
-	
+
 	sprintf(arquivo, "%d", cpu_time_used.size);
 	strcpy(type, ".txt");
 
 	strcat(path, ordem);
 	strcat(path, arquivo);
 	strcat(path, type);
-	
+
 	tempo = fopen (path, "wt");
 
 	if (tempo == NULL) {
 		printf("Erro ao abrir o arquivo.\n");
 		exit(1);
 	}
-	
+
 	fprintf(tempo, "%.5lf %d %d\n", cpu_time_used.cpu, cpu_time_used.size, cpu_time_used.type);
 	fclose(tempo);
+
+}
+
+void bubble_sort(int tamanho, int * vector, int tipo) {
+
+	//Bubble Sort - algoritmo de ordenação
 	
+	clock_t start, end;// para medir o tempo, vem da time.h
+	time_cpu cpu_time_used;
+
+	double comparacao = 0; //conta as comparações feitas
+	
+	start = clock();
+	int i, j, aux;
+	for (i = 0; i < tamanho; i++) {
+		comparacao++;
+		for (j = tamanho - 1; j > i; j--) {
+			comparacao++;
+			comparacao++;
+			if(vector[j] < vector[j - 1]) {
+				aux = vector[j];
+				vector[j] = vector[j - 1];
+				vector[j - 1] = aux;
+			}
+		}
+		comparacao++;
+	}
+	comparacao++;
+
+	end = clock();
+
+	cpu_time_used.cpu = ((double) (end - start)) / CLOCKS_PER_SEC;
+	cpu_time_used.size = tamanho;
+	cpu_time_used.type = tipo;
+
+	grava_tempo(cpu_time_used);
+	grava_comparacao(comparacao, tamanho, tipo);
+
 }
 
 
@@ -180,8 +193,7 @@ int main() {
 	int sizes[S] = {100, 500, 1000, 5000, 30000, 80000, 100000, 150000, 200000};
 	//vetor que guarda os tamanhos de vetores a serem testados
 
-	clock_t start, end;// para medir o tempo, vem da time.h
-	time_cpu cpu_time_used;
+	
 
 	int ordem[3] = {1, 2, 3};
 	//vetor que guarda o tipo do arquivo
@@ -202,16 +214,8 @@ int main() {
 			tipo = ordem[t];
 
 			int * vector = abre_arquivo(tamanho, tipo);
-
-			//start = clock();
+			
 			bubble_sort(tamanho, vector, tipo);
-			//end = clock();
-
-			//cpu_time_used.cpu = ((double) (end - start)) / CLOCKS_PER_SEC;
-			//cpu_time_used.size = tamanho;
-			//cpu_time_used.type = tipo;
-
-			//grava_tempo(cpu_time_used);
 
 		}
 
