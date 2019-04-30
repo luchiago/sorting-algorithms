@@ -1,13 +1,24 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #define S 9
 
-int* abre_arquivo(int tamanho, int tipo) {
+typedef struct {
 	
+	double cpu;
+	
+	int size;
+	
+	int type;
+	
+}time_cpu;
+
+int * abre_arquivo(int tamanho, int tipo) {
+
 	//Função para abertura dos arquivos com os numeros aleatorios
-	
+
 	FILE * arq; //variável para guardar o ponteiro pro arquivo
 	char path[30]; //caminho para o arquivo
 	char type[5]; //para guardar o ".txt"
@@ -21,7 +32,7 @@ int* abre_arquivo(int tamanho, int tipo) {
 		strcpy(ordem, "decrescente/");
 	else
 		strcpy(ordem, "random/");
-	
+
 	strcpy(type, ".txt");
 
 	sprintf(arquivo, "%d", tamanho); //converte o tamanho para char
@@ -44,19 +55,19 @@ int* abre_arquivo(int tamanho, int tipo) {
 	int result, i;
 
 	for (i = 0; i < tamanho; i++) {
-		fscanf(arq, "%d", &result);
+		fscanf(arq, "%d", & result);
 		vector[i] = result;
 	}
-	
+
 	fclose(arq);
-	
+
 	return vector;
 }
 
 void get_vector(int tamanho, int * vector) {
-	
+
 	//Função que imprime o vetor
-	
+
 	int i;
 
 	for (i = 0; i < tamanho; i++)
@@ -65,14 +76,55 @@ void get_vector(int tamanho, int * vector) {
 
 }
 
-void bubble_sort(int tamanho, int * vector) {
-
-	//Bubble Sort - algoritmo de ordenação 
+void grava_comparacao(double c, int tamanho, int tipo) {
 	
+	FILE * comparacao;//arquivo para gravar os resultados de comparacao
+	
+	char path[50]; //caminho para o arquivo
+	char type[5]; //para guardar o ".txt"
+	char arquivo[10]; //para guardar o nome do arquivo
+	char ordem[15];
+	
+	//./resultados/bubble_sort/comparacao
+	strcpy(path, "./resultados/bubble_sort/comparacao/");
+	if (tipo == 1)
+		strcpy(ordem, "crescente_");
+	else if (tipo == 2)
+		strcpy(ordem, "decrescente_");
+	else
+		strcpy(ordem, "random_");
+	
+	sprintf(arquivo, "%d", tamanho);
+	strcpy(type, ".txt");
+
+	strcat(path, ordem);
+	strcat(path, arquivo);
+	strcat(path, type);
+	
+	comparacao = fopen (path, "wt");
+
+	if (comparacao == NULL) {
+		printf("Erro ao abrir o arquivo.\n");
+		exit(1);
+	}
+	
+	fprintf(comparacao, "%.0lf\n", c);
+	fclose(comparacao);
+}
+
+void bubble_sort(int tamanho, int * vector, int tipo) {
+
+	//Bubble Sort - algoritmo de ordenação
+	
+	double comparacao = 0; //conta as comparações feitas
+
 	int i, j, aux;
 	for (i = 0; i < tamanho; i++) {
+		comparacao++;
 		for (j = 0; j < tamanho - 1; j++) {
+			comparacao++;
 			if(vector[j] > vector[j + 1]) {
+				comparacao++;
 				aux = vector[j];
 				vector[j] = vector[j + 1];
 				vector[j + 1] = aux;
@@ -80,17 +132,57 @@ void bubble_sort(int tamanho, int * vector) {
 		}
 	}
 	
-	printf("\nVetor ordenado por bubble sort de tamanho %d\n", tamanho);
-	get_vector(tamanho, vector);
+	grava_comparacao(comparacao, tamanho, tipo);
 
 }
+
+void grava_tempo(time_cpu cpu_time_used) {
+	
+	FILE * tempo;//arquivo para gravar os resultados de tempo
+	
+	char path[50]; //caminho para o arquivo
+	char type[5]; //para guardar o ".txt"
+	char arquivo[10]; //para guardar o nome do arquivo
+	char ordem[15];
+	
+	//./resultados/bubble_sort/tempo
+	strcpy(path, "./resultados/bubble_sort/tempo/");
+	if (cpu_time_used.type == 1)
+		strcpy(ordem, "crescente_");
+	else if (cpu_time_used.type == 2)
+		strcpy(ordem, "decrescente_");
+	else
+		strcpy(ordem, "random_");
+	
+	sprintf(arquivo, "%d", cpu_time_used.size);
+	strcpy(type, ".txt");
+
+	strcat(path, ordem);
+	strcat(path, arquivo);
+	strcat(path, type);
+	
+	tempo = fopen (path, "wt");
+
+	if (tempo == NULL) {
+		printf("Erro ao abrir o arquivo.\n");
+		exit(1);
+	}
+	
+	fprintf(tempo, "%.5lf %d %d\n", cpu_time_used.cpu, cpu_time_used.size, cpu_time_used.type);
+	fclose(tempo);
+	
+}
+
 
 int main() {
 
 	int tamanho; //variável para guardar o tamanho corrente do vetor
 	int sizes[S] = {100, 500, 1000, 5000, 30000, 80000, 100000, 150000, 200000};
 	//vetor que guarda os tamanhos de vetores a serem testados
-	
+
+	clock_t start, end;// para medir o tempo, vem da time.h
+	time_cpu cpu_time_used;
+
 	int ordem[3] = {1, 2, 3};
 	//vetor que guarda o tipo do arquivo
 	//1 - crescente (Melhor caso)
@@ -98,38 +190,29 @@ int main() {
 	//3 - aleatório
 	int tipo;
 
-	printf("Bubble Sort\n");
-
 	int i, t;
 
 	for (i = 0; i < S; i++) {
-		
+
 		//Vai iterar todos os arquivos
-		
-		printf("\n----------------------------------------\n");
-		printf("Tamanho do vetor: %d\n", sizes[i]);
-		
+
 		tamanho = sizes[i]; //aqui ele pega o tamanho no vetor de tamanhos
-		
-		for(t = 0; t < 3; t++){
+
+		for(t = 0; t < 3; t++) {
 			tipo = ordem[t];
-			
-			if (tipo == 1)
-				printf("\nCrescente\n");
-			else if (tipo == 2)
-				printf("\nDecrescente\n");
-			else
-				printf("\nRandom\n");
-			
+
 			int * vector = abre_arquivo(tamanho, tipo);
 
-			get_vector(tamanho, vector);
-			
-			//system("pause");
-	
-			bubble_sort(tamanho, vector);
-			
-			//system("pause");
+			//start = clock();
+			bubble_sort(tamanho, vector, tipo);
+			//end = clock();
+
+			//cpu_time_used.cpu = ((double) (end - start)) / CLOCKS_PER_SEC;
+			//cpu_time_used.size = tamanho;
+			//cpu_time_used.type = tipo;
+
+			//grava_tempo(cpu_time_used);
+
 		}
 
 	}
