@@ -121,20 +121,20 @@ int * quick_sort(int * vector, int p, int r, int TAM, int tipo) {
 	int x = vector[(p + r) / 2];
 	int aux;
 	
-	double comparacao = 0;
+	//double comparacao = 0;
 
 	while(i <= j) {
-		comparacao++;
+		//comparacao++;
 		while(vector[i] < x) {
-			comparacao++;
+			//comparacao++;
 			i++;
 		}
 		while(vector[j] > x) {
-			comparacao++;
+			//comparacao++;
 			j--;
 		}
 		if(i <= j){
-			comparacao++;
+			//comparacao++;
 			aux = vector[i];
 			vector[i] = vector[j];
 			vector[j] = aux;
@@ -144,15 +144,15 @@ int * quick_sort(int * vector, int p, int r, int TAM, int tipo) {
 	}
 	
 	if(p < j){
-		comparacao++;
+		//comparacao++;
 		quick_sort(vector, p, j, TAM, tipo);
 	}
 	if(r > i){
-		comparacao++;
+		//comparacao++;
 		quick_sort(vector, i, r, TAM, tipo);
 	}
 	
-	grava_comparacao(comparacao, TAM, tipo);
+	//grava_comparacao(comparacao, TAM, tipo);
 	
 	return vector;
 
