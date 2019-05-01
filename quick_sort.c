@@ -79,7 +79,7 @@ void grava_comparacao(double c, int tamanho, int tipo) {
 	char caso[15]; //para guardar o caso (crescente, decrescente, aleatório)
 	char ext[5]; //para guardar o ".txt"
 
-	strcpy(path, "./resultados/heap_sort/comparacao/");
+	strcpy(path, "./resultados/quick_sort/comparacao/");
 
 	if (tipo == 1)
 		strcpy(caso, "crescente_");
@@ -120,7 +120,7 @@ void grava_tempo(double tempo, int tamanho, int tipo) {
 	char ext[5]; //para guardar o ".txt"
 
 	//./resultados/bubble_sort/tempo
-	strcpy(path, "./resultados/heap_sort/tempo/");
+	strcpy(path, "./resultados/quick_sort/tempo/");
 
 	if (tipo == 1)
 		strcpy(caso, "crescente_");
